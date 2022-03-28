@@ -32,8 +32,9 @@ jobs:
       id: create_check_run
       with:
         route: POST /repos/{owner}/{repo}/check-runs
-        
         name: "Test check run"
+        repo: action-env-test
+        owner: ${{ github.repository_owner }}
         head_sha: ${{ github.sha }}
         output: | # The | is significant!
           title: Test check run title
@@ -50,6 +51,8 @@ jobs:
       with:
         route: PATCH /repos/{owner}/{repo}/check-runs/{check_run_id}
         check_run_id: ${{ fromJson(steps.create_check_run.outputs.data).id }}
+        repo: action-env-test
+        owner: ${{ github.repository_owner }}
         conclusion: "success"
         status: "completed"
       env:
