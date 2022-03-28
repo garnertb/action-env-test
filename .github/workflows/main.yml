@@ -22,13 +22,20 @@ jobs:
       name: github-prod
       url: https://github.com
     # Steps represent a sequence of tasks that will be executed as part of the job
+    strategy:
+      matrix:
+        repo: 
+          - code-clean-up-2021-ChiAuTxDo
+          - code-clean-up-2021-heather-reich
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
 
       # Runs a set of commands using the runners shell
       - name: Run a multi-line script
-        run: |
-          echo Add other actions to build,
-          echo test, and deploy your project.
+        run: echo Add other actions to $repo
+        env: 
+          repo: ${{matrix.repo}}
+          
+          
       
