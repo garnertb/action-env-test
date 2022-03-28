@@ -1,6 +1,6 @@
 # This is a basic workflow to help you get started with Actions
 
-name: CI
+name: Delete Repository
 
 # Controls when the workflow will run
 on:
@@ -28,14 +28,42 @@ jobs:
           - code-clean-up-2021-ChiAuTxDo
           - code-clean-up-2021-heather-reich
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v2
+    - uses: octokit/request-action@v2.x
+      id: create_check_run
+      with:
+        route: POST /repos/{owner}/{repo}/check-runs
+        owner: octokit
+        repo: request-action
+        name: "Test check run"
+        head_sha: ${{ github.sha }}
+        output: | # The | is significant!
+          title: Test check run title
+          summary: A summary of the test check run
+          images:
+            - alt: Test image
+              image_url: https://octodex.github.com/images/jetpacktocat.png
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # Runs a set of commands using the runners shell
-      - name: Run a multi-line script
-        run: echo Add other actions to $repo
-        env: 
-          repo: ${{matrix.repo}}
+      # Update check run to completed, successful status
+    - uses: octokit/request-action@v2.x
+      id: update_check_run
+      with:
+        route: PATCH /repos/{owner}/{repo}/check-runs/{check_run_id}
+        owner: octokit
+        repo: request-action
+        check_run_id: ${{ fromJson(steps.create_check_run.outputs.data).id }}
+        conclusion: "success"
+        status: "completed"
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - uses: actions/checkout@v2
+
+    # Runs a set of commands using the runners shell
+    - name: Run a multi-line script
+      run: echo Add other actions to $repo
+      env: 
+        repo: ${{matrix.repo}}
           
           
       
